@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Физика Онлайн</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .avatar {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+        .course-card {
+            transition: transform 0.3s;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+        .progress-bar {
+            height: 25px;
+        }
+        #chatMessages {
+            height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Физика Онлайн</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="#courses">Курсы</a>
+                <a class="nav-link" href="#chat">Чат</a>
+                <a class="nav-link" href="#profile">Профиль</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Регистрация/Вход -->
+        <div id="authSection" class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-4">Вход/Регистрация</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="loginForm" onsubmit="return login(event)">
+                            <h5>Вход</h5>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" class="form-control" placeholder="Пароль" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Войти</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <form id="registerForm" onsubmit="return register(event)">
+                            <h5>Регистрация</h5>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Имя" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" class="form-control" placeholder="Пароль" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Зарегистрироваться</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Курсы -->
+        <div id="courses" class="mb-4">
+            <h2 class="mb-3">Доступные курсы</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4" id="coursesList"></div>
+        </div>
+
+        <!-- Чат -->
+        <div id="chat" class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-3">Чат курса</h4>
+                <div id="chatMessages" class="mb-3"></div>
+                <div class="input-group">
+                    <input type="text" id="messageInput" class="form-control" placeholder="Ваше сообщение">
+                    <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Профиль -->
+        <div id="profile" class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-3">Профиль</h4>
+                <div class="text-center">
+                    <img src="https://via.placeholder.com/100" class="avatar rounded-circle mb-3" id="userAvatar">
+                    <input type="file" id="avatarUpload" class="form-control mb-3" onchange="updateAvatar(this)">
+                </div>
+                <div class="mb-3">
+                    <h5 id="userName"></h5>
+                    <p id="userEmail"></p>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted">Прогресс обучения: 0%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Имитация базы данных
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let currentUser = null;
+        let messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+        // Пример курсов
+        const courses = [
+            {
+                id: 1,
+                title: "Основы механики",
+                description: "Изучите базовые принципы механики",
+                progress: 0,
+                lessons: ["Введение", "Кинематика", "Динамика"]
+            },
+            {
+                id: 2,
+                title: "Термодинамика",
+                description: "Основы тепловых явлений",
+                progress: 0,
+                lessons: ["Температура", "Законы термодинамики"]
+            }
+        ];
+
+        // Инициализация
+        function init() {
+            renderCourses();
+            renderChat();
+            checkAuth();
+        }
+
+        // Рендер курсов
+        function renderCourses() {
+            const container = document.getElementById('coursesList');
+            container.innerHTML = courses.map(course => `
+                <div class="col">
+                    <div class="card course-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${course.title}</h5>
+                            <p class="card-text">${course.description}</p>
+                            <div class="progress mb-3">
+                                <div class="progress-bar" style="width: ${course.progress}%"></div>
+                            </div>
+                            <button class="btn btn-primary" onclick="startCourse(${course.id})">Начать обучение</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Чат
+        function renderChat() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = messages.map(msg => `
+                <div class="card mb-2">
+                    <div class="card-body p-2">
+                        <strong>${msg.user}:</strong> ${msg.text}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Обновление аватара
+        function updateAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('userAvatar').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Авторизация
+        function login(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            // Реализация проверки...
+            currentUser = {name: "Пример Пользователя", email: "test@example.com"};
+            checkAuth();
+        }
+
+        // Регистрация
+        function register(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            // Реализация регистрации...
+            alert('Регистрация успешна!');
+        }
+
+        // Проверка авторизации
+        function checkAuth() {
+            if(currentUser) {
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userEmail').textContent = currentUser.email;
+            }
+        }
+
+        // Запуск при загрузке
+        init();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
