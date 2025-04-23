@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,30 +8,61 @@
 </head>
 <body>
     <header>
-        <h1>Video Sharing Platform</h1>
-        <div class="auth-buttons">
-            <button id="loginBtn">Login</button>
-            <button id="registerBtn">Register</button>
-        </div>
+        <h1>My Video Platform</h1>
+        <nav>
+            <ul>
+                <li><a href="#login">Login</a></li>
+                <li><a href="#register">Register</a></li>
+            </ul>
+        </nav>
     </header>
-    
+
     <main>
-        <section id="videoUpload">
+        <section id="video-upload">
             <h2>Upload Video</h2>
-            <form id="uploadForm">
-                <input type="text" placeholder="Title" id="videoTitle" required>
-                <textarea placeholder="Description" id="videoDescription" required></textarea>
-                <input type="file" id="videoFile" required>
+            <form action="/upload" method="POST">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+                
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required></textarea>
+                
+                <label for="video-file">Choose video file:</label>
+                <input type="file" id="video-file" name="video-file" accept="video/*" required>
+                
                 <button type="submit">Upload</button>
             </form>
         </section>
 
-        <section id="videoList">
+        <section id="video-gallery">
             <h2>Videos</h2>
-            <div id="videos"></div>
+            <div class="video">
+                <h3>Video Title</h3>
+                <video controls>
+                    <source src="video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p>Description of the video.</p>
+                <button>Like</button>
+                <button>Dislike</button>
+                <div class="comments">
+                    <h4>Comments</h4>
+                    <form action="/comment" method="POST">
+                        <textarea name="comment" placeholder="Leave a comment..."></textarea>
+                        <button type="submit">Post Comment</button>
+                    </form>
+                    <ul>
+                        <li>User1: Great video!</li>
+                        <li>User2: I didn't like it.</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Repeat video blocks as necessary -->
         </section>
     </main>
 
-    <script src="script.js"></script>
+    <footer>
+        <p>&copy; 2023 My Video Platform</p>
+    </footer>
 </body>
 </html>
