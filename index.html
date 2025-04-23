@@ -4,65 +4,238 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Sharing Platform</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Basic CSS Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .auth-forms {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-forms.active {
+            display: block;
+        }
+
+        .video-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .video-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 5px 10px;
+            margin: 5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+    </style>
 </head>
 <body>
     <header>
         <h1>My Video Platform</h1>
         <nav>
-            <ul>
-                <li><a href="#login">Login</a></li>
-                <li><a href="#register">Register</a></li>
+            <div class="user-info">
+                <span id="usernameDisplay"></span>
+                <button onclick="logout()">Logout</button>
+            </div>
+            <ul id="authLinks">
+                <li><a href="#" onclick="showAuthForm('login')">Login</a></li>
+                <li><a href="#" onclick="showAuthForm('register')">Register</a></li>
             </ul>
         </nav>
     </header>
 
+    <!-- Auth Forms -->
+    <div id="authModal" class="auth-forms">
+        <form id="loginForm" onsubmit="handleAuth(event, 'login')">
+            <h2>Login</h2>
+            <input type="text" placeholder="Username" required>
+            <input type="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+            <button type="button" onclick="hideAuthForms()">Cancel</button>
+        </form>
+
+        <form id="registerForm" onsubmit="handleAuth(event, 'register')">
+            <h2>Register</h2>
+            <input type="text" placeholder="Username" required>
+            <input type="password" placeholder="Password" required>
+            <button type="submit">Register</button>
+            <button type="button" onclick="hideAuthForms()">Cancel</button>
+        </form>
+    </div>
+
     <main>
-        <section id="video-upload">
+        <section id="videoUpload" class="hidden">
             <h2>Upload Video</h2>
-            <form action="/upload" method="POST">
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
-                
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" required></textarea>
-                
-                <label for="video-file">Choose video file:</label>
-                <input type="file" id="video-file" name="video-file" accept="video/*" required>
-                
+            <form onsubmit="uploadVideo(event)">
+                <input type="text" id="title" placeholder="Title" required>
+                <textarea id="description" placeholder="Description" required></textarea>
+                <input type="file" id="videoFile" accept="video/*" required>
                 <button type="submit">Upload</button>
             </form>
         </section>
 
-        <section id="video-gallery">
-            <h2>Videos</h2>
-            <div class="video">
-                <h3>Video Title</h3>
-                <video controls>
-                    <source src="video.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-                <p>Description of the video.</p>
-                <button>Like</button>
-                <button>Dislike</button>
-                <div class="comments">
-                    <h4>Comments</h4>
-                    <form action="/comment" method="POST">
-                        <textarea name="comment" placeholder="Leave a comment..."></textarea>
-                        <button type="submit">Post Comment</button>
-                    </form>
-                    <ul>
-                        <li>User1: Great video!</li>
-                        <li>User2: I didn't like it.</li>
-                    </ul>
-                </div>
+        <section id="videoGallery">
+            <h2>Latest Videos</h2>
+            <div class="video-gallery" id="videoContainer">
+                <!-- Videos will be loaded here dynamically -->
             </div>
-            <!-- Repeat video blocks as necessary -->
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2023 My Video Platform</p>
-    </footer>
+    <script>
+        // User Authentication System
+        let currentUser = null;
+        
+        function showAuthForm(type) {
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
+        }
+
+        function hideAuthForms() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function handleAuth(event, type) {
+            event.preventDefault();
+            const username = event.target[0].value;
+            const password = event.target[1].value;
+
+            if (type === 'register') {
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                if (users.some(user => user.username === username)) {
+                    alert('Username already exists!');
+                    return;
+                }
+                users.push({ username, password });
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('Registration successful!');
+            } else {
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const user = users.find(u => u.username === username && u.password === password);
+                if (!user) {
+                    alert('Invalid credentials!');
+                    return;
+                }
+                currentUser = username;
+                updateUI();
+                alert('Login successful!');
+            }
+            hideAuthForms();
+        }
+
+        function logout() {
+            currentUser = null;
+            updateUI();
+        }
+
+        // Video System
+        function uploadVideo(event) {
+            event.preventDefault();
+            if (!currentUser) return alert('Please login first!');
+            
+            const video = {
+                id: Date.now(),
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                author: currentUser,
+                likes: 0,
+                dislikes: 0,
+                comments: []
+            };
+
+            const videos = JSON.parse(localStorage.getItem('videos') || '[]');
+            videos.push(video);
+            localStorage.setItem('videos', JSON.stringify(videos));
+            loadVideos();
+            event.target.reset();
+        }
+
+        function loadVideos() {
+            const container = document.getElementById('videoContainer');
+            const videos = JSON.parse(localStorage.getItem('videos') || '[]');
+            
+            container.innerHTML = videos.map(video => `
+                <div class="video-card">
+                    <h3>${video.title}</h3>
+                    <video controls width="100%">
+                        <source src="${URL.createObjectURL(video.file)}" type="video/mp4">
+                    </video>
+                    <p>${video.description}</p>
+                    <div>
+                        <button onclick="handleLike(${video.id})">👍 ${video.likes}</button>
+                        <button onclick="handleDislike(${video.id})">👎 ${video.dislikes}</button>
+                    </div>
+                    <div class="comments">
+                        <h4>Comments (${video.comments.length})</h4>
+                        <form onsubmit="addComment(event, ${video.id})">
+                            <textarea required placeholder="Add comment"></textarea>
+                            <button type="submit">Post</button>
+                        </form>
+                        <ul>
+                            ${video.comments.map(c => `<li><strong>${c.author}:</strong> ${c.text}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update UI based on auth status
+        function updateUI() {
+            const isLoggedIn = !!currentUser;
+            document.getElementById('videoUpload').classList.toggle('hidden', !isLoggedIn);
+            document.getElementById('authLinks').style.display = isLoggedIn ? 'none' : 'flex';
+            document.querySelector('.user-info').style.display = isLoggedIn ? 'flex' : 'none';
+            document.getElementById('usernameDisplay').textContent = isLoggedIn ? currentUser : '';
+        }
+
+        // Initial load
+        updateUI();
+        loadVideos();
+    </script>
 </body>
 </html>
