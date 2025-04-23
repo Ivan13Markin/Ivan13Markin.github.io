@@ -1,0 +1,37 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Sharing Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Video Sharing Platform</h1>
+        <div class="auth-buttons">
+            <button id="loginBtn">Login</button>
+            <button id="registerBtn">Register</button>
+        </div>
+    </header>
+    
+    <main>
+        <section id="videoUpload">
+            <h2>Upload Video</h2>
+            <form id="uploadForm">
+                <input type="text" placeholder="Title" id="videoTitle" required>
+                <textarea placeholder="Description" id="videoDescription" required></textarea>
+                <input type="file" id="videoFile" required>
+                <button type="submit">Upload</button>
+            </form>
+        </section>
+
+        <section id="videoList">
+            <h2>Videos</h2>
+            <div id="videos"></div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
