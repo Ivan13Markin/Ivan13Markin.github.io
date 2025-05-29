@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Поддержать проект</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -33,9 +33,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>');
-            background-size: 30px;
-            opacity: 0.3;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.05) 0%, transparent 20%);
             z-index: -1;
         }
         
@@ -51,17 +51,6 @@
             overflow: hidden;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            z-index: -1;
         }
         
         header {
@@ -81,6 +70,7 @@
             opacity: 0.9;
             max-width: 600px;
             margin: 0 auto;
+            line-height: 1.6;
         }
         
         .content {
@@ -102,6 +92,11 @@
             margin-bottom: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
         }
         
         .card h2 {
@@ -130,6 +125,17 @@
         .card ul li {
             margin-bottom: 8px;
             line-height: 1.5;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .card ul li:before {
+            content: '•';
+            color: #4dabf7;
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: -5px;
         }
         
         .wallet-section {
@@ -149,12 +155,24 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .wallet-card:hover {
+            transform: scale(1.02);
         }
         
         .wallet-icon {
             font-size: 4rem;
             color: #2aabee;
             margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         
         .wallet-address {
@@ -169,6 +187,14 @@
             gap: 10px;
             flex-wrap: wrap;
             word-break: break-all;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .wallet-address:hover {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: #2aabee;
         }
         
         .wallet-address span {
@@ -190,6 +216,24 @@
             border: none;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: rgba(255,255,255,0.3);
+            transform: rotate(25deg);
+            transition: all 0.4s;
+        }
+        
+        .btn:hover:after {
+            left: 120%;
         }
         
         .btn:hover {
@@ -198,5 +242,282 @@
         }
         
         .btn i {
-            margin-right
-
+            margin-right: 8px;
+        }
+        
+        .qrcode-container {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+            justify-content: center;
+        }
+        
+        .step {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateY(-5px);
+        }
+        
+        .step-number {
+            background: linear-gradient(to right, #25d366, #2aabee);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(30, 30, 40, 0.95);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .wallet-address {
+                font-size: 1rem;
+            }
+        }
+        
+        .pulse {
+            animation: btnPulse 2s infinite;
+        }
+        
+        @keyframes btnPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(42, 171, 238, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(42, 171, 238, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(42, 171, 238, 0);
+            }
+        }
+        
+        .heart {
+            color: #ff6b6b;
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.2); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.2); }
+            60% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-heart heart"></i> Поддержать проект</h1>
+            <p class="subtitle">Ваша поддержка помогает развивать проект и создавать новые возможности. Каждое пожертвование, независимо от размера, очень ценно для нас!</p>
+        </header>
+        
+        <div class="content">
+            <div class="info-section">
+                <div class="card">
+                    <h2><i class="fas fa-info-circle"></i> О проекте</h2>
+                    <p>Этот проект создан с целью предоставления ценных ресурсов и возможностей совершенно бесплатно. Мы верим, что знания и возможности должны быть доступны каждому.</p>
+                    <p>Ваши пожертвования помогут:</p>
+                    <ul>
+                        <li>Поддерживать серверы и инфраструктуру</li>
+                        <li>Разрабатывать новые функции и улучшения</li>
+                        <li>Создавать обучающие материалы</li>
+                        <li>Поддерживать сообщество пользователей</li>
+                        <li>Обеспечивать бесплатный доступ для всех</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-gift"></i> Что вы получите</h2>
+                    <p>В знак благодарности за вашу поддержку:</p>
+                    <ul>
+                        <li>Имя в списке благодарностей на сайте</li>
+                        <li>Ранний доступ к новым функциям</li>
+                        <li>Эксклюзивные материалы для спонсоров</li>
+                        <li>Персональную благодарность от команды</li>
+                        <li>Доступ к закрытому чату спонсоров</li>
+                    </ul>
+                    <p>Мы очень ценим каждого, кто поддерживает наш проект!</p>
+                </div>
+            </div>
+            
+            <div class="wallet-section">
+                <div class="wallet-card">
+                    <div class="wallet-icon">
+                        <i class="fab fa-telegram"></i>
+                    </div>
+                    <h2>Telegram Кошелек</h2>
+                    <p>Для перевода средств используйте следующий username:</p>
+                    <div class="wallet-address" id="walletAddressElement">
+                        <i class="fab fa-telegram"></i>
+                        <span id="walletAddress">@MySuperWallet</span>
+                    </div>
+                    <button id="copyButton" class="btn pulse">
+                        <i class="fas fa-copy"></i> Скопировать адрес
+                    </button>
+                    <p>или отсканируйте QR-код:</p>
+                    <div id="qrcode" class="qrcode-container"></div>
+                    <a href="https://t.me/MySuperWallet" class="btn" target="_blank">
+                        <i class="fab fa-telegram"></i> Перейти в Telegram
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Откройте Telegram</h3>
+                <p>Запустите приложение Telegram на вашем устройстве</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Перейдите в кошелек</h3>
+                <p>Откройте раздел "Кошелек" в меню Telegram</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Сделайте перевод</h3>
+                <p>Введите адрес кошелька или отсканируйте QR-код</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Адрес скопирован в буфер обмена!</span>
+    </div>
+    
+    <footer>
+        <p>С благодарностью, команда проекта · Все пожертвования идут на развитие</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ============== ВАШ TELEGRAM USERNAME ЗДЕСЬ ==============
+            const walletAddress = "@Ivan201306";
+            // =========================================================
+            
+            const telegramLink = "https://t.me/" + walletAddress.substring(1);
+            
+            // Обновляем адрес кошелька
+            document.getElementById('walletAddress').textContent = walletAddress;
+            
+            // Обновляем ссылку
+            const telegramBtn = document.querySelector('.btn[target="_blank"]');
+            telegramBtn.href = telegramLink;
+            
+            // Генерируем QR-код
+            const qrElement = document.getElementById("qrcode");
+            QRCode.toCanvas(qrElement, telegramLink, {
+                width: 170,
+                margin: 0,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            }, function(error) {
+                if (error) {
+                    console.error('Ошибка генерации QR-кода:', error);
+                    qrElement.innerHTML = '<p style="color:black;text-align:center;">Ошибка генерации QR-кода</p>';
+                }
+            });
+            
+            // Копирование адреса
+            document.getElementById('copyButton').addEventListener('click', copyAddress);
+            document.getElementById('walletAddressElement').addEventListener('click', copyAddress);
+            
+            function copyAddress() {
+                navigator.clipboard.writeText(walletAddress).then(() => {
+                    showNotification('Адрес скопирован в буфер обмена!');
+                }).catch(err => {
+                    showNotification('Не удалось скопировать адрес');
+                    console.error('Ошибка копирования: ', err);
+                });
+            }
+            
+            // Показ уведомления
+            function showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.querySelector('span').textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
